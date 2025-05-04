@@ -2,10 +2,9 @@
 using Application.ViewModel;
 using Core.Entity;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Extensions;
 
 namespace WebApi.Controllers;
-[Route("api/v1/contacts")]
+[Route("persistence-api/v1/contacts")]
 [ApiController]
 public class ContactController : ControllerBase
 {
@@ -23,12 +22,11 @@ public class ContactController : ControllerBase
         {
             var contacts = await _contactService.GetAllAsync();
 
-            return Ok(new ResultViewModel<IList<Contact>>(contacts));
+            return Ok(contacts);
         }
         catch (SystemException)
         {
-            // 01P01 é um código único qualquer que facilita identificar onde o erro foi gerado (Uma boa prática)
-            return StatusCode(500, new ResultViewModel<IList<Contact>>("01P01 - Internal server error")); 
+            return StatusCode(500, "01P01 - Internal server error"); 
         }
     }
 
@@ -39,14 +37,11 @@ public class ContactController : ControllerBase
         {
             var contact = await _contactService.GetByIdAsync(id);
 
-            if (contact is null)
-                return NoContent();
-
-            return Ok(new ResultViewModel<Contact>(contact));
+            return Ok(contact);
         }
         catch
         {
-            return StatusCode(500, new ResultViewModel<Contact>("01P02- Internal server error"));
+            return StatusCode(500, "01P02- Internal server error");
         }
     }
 
@@ -57,69 +52,52 @@ public class ContactController : ControllerBase
         {
             var contacts = await _contactService.GetAllByDddAsync(id);
 
-            return Ok(new ResultViewModel<IList<Contact>>(contacts));
+            return Ok(contacts);
         }
         catch (Exception)
         {
-            return StatusCode(500, new ResultViewModel<Contact>("01P04- Internal server error"));
+            return StatusCode(500, "01P03- Internal server error");
         }
     }
 
+    [HttpGet("persistence-error-test/{fail:bool}")]
+    public async Task<ActionResult<string>> PersistanceApiErrorTest(bool fail)
+    {
+        if (fail)
+        {
+            return StatusCode(500, "01P04- Internal server error");
+        }
+
+        return Ok("Persistance Api is working again");
+    }
+
     [HttpPost()]
-    public async Task<IActionResult> PostAsync([FromBody] ContactViewModel model)
+    public async Task<IActionResult> PostAsync([FromBody] Contact contact)
     {
         try
         {
-            if (!ModelState.IsValid) 
-            {
-                return BadRequest(new ResultViewModel<Contact>(ModelState.GetErrors()));
-            }
+           await _contactService.CreateAsync(contact);
 
-            var contact = new Contact
-            {
-                Name = model.Name,
-                Phone = model.Phone,
-                Email = model.Email,
-                DddId = model.DddId,
-            };
-
-            await _contactService.CreateAsync(contact);
-
-            return Created($"api/v1/contacts/{contact.Id}", new ResultViewModel<Contact>(contact));
+           return Created($"persistence-api/v1/contacts/{contact.Id}", contact);
         }
         catch (Exception)
         {
-            return StatusCode(500, new ResultViewModel<Contact>("01P05 - Internal server error"));
+            return StatusCode(500, "01P05 - Internal server error");
         }
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> PutAsync([FromRoute] int id, [FromBody] ContactViewModel model)
+    public async Task<IActionResult> PutAsync([FromRoute] int id, [FromBody] Contact contact)
     {
         try
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ResultViewModel<Contact>(ModelState.GetErrors()));
-            }
-
-            var contact = await _contactService.GetByIdAsync(id);
-            
-            if (contact is null)
-                return BadRequest(new ResultViewModel<Contact>("01P06 - Invalid contact id"));
-
-            contact.Name = model.Name;
-            contact.Phone = model.Phone;
-            contact.Email = model.Email;
-            contact.DddId = model.DddId;
-
+        {            
             await _contactService.EditAsync(contact);
                         
-            return Ok(new ResultViewModel<Contact>(contact));
+            return Ok(contact);
         }
         catch (Exception)
         {
-            return StatusCode(500, new ResultViewModel<Contact>("01P07 - Internal server error"));
+            return StatusCode(500, "01P06 - Internal server error");
         }
     }
 
@@ -129,9 +107,9 @@ public class ContactController : ControllerBase
         try
         {
             var contact = await _contactService.GetByIdAsync(id);
-
+                
             if (contact is null)
-                return BadRequest(new ResultViewModel<Contact>("01P08 - Invalid contact id"));
+                return BadRequest("01P07 - Invalid contact id");
 
             await _contactService.DeleteAsync(contact);
 
@@ -139,7 +117,7 @@ public class ContactController : ControllerBase
         }
         catch (Exception)
         {
-            return StatusCode(500, new ResultViewModel<Contact>("01P09 - Internal server error"));
+            return StatusCode(500, "01P08 - Internal server error");
         }
     }
 }
