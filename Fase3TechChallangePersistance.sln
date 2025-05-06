@@ -15,6 +15,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "05_UnitTest", "05_UnitTest\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "06_IntegrationTest", "06_IntegrationTest\06_IntegrationTest.csproj", "{9832B99C-765E-4932-B6D4-2198BDE3FD97}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{5AFD61A2-774E-4246-80C3-9D470936F7E0}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\FASE 1\Tech Challange\Fase1TechChallenge\.github\workflows\ci.yml = ..\..\..\FASE 1\Tech Challange\Fase1TechChallenge\.github\workflows\ci.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +55,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5AFD61A2-774E-4246-80C3-9D470936F7E0} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BFA847A2-C1B7-48BE-8B16-E63E177EAFE1}
