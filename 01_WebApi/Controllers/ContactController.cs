@@ -7,6 +7,7 @@ namespace WebApi.Controllers;
 [ApiController]
 public class ContactController : ControllerBase
 {
+    // Controller de persistência
     private readonly IContactService _contactService;    
 
     public ContactController(IContactService contactService)
